@@ -1,11 +1,12 @@
 from langchain_ollama.llms import OllamaLLM 
 from langchain_core.prompts import ChatPromptTemplate
 from vector import retriever
+import time
 
 
-
-model = OllamaLLM(model="llama3.2:latest")
+model = OllamaLLM(model="llama3.2:latest", temperature=0.0, stream=True)
 #model=OllamaLLM(model="llama2:7b")
+#model=OllamaLLM(model="mistral:latest", temperature=0.0, stream=True)
 
 old_template = """
 You're the best chemistry teacher ever.
@@ -21,23 +22,25 @@ Question:
 """
 
 template = """
-Vous êtes le meilleur professeur de chimie.
+Vous êtes un professeur de chimie très rigoureux. Vous ne devez répondre que si l'information est **STRICTEMENT présente dans le CONTEXTE**.
 
-Règles à respecter :
-1. Réponde **uniquement** à partir des informations figurant dans le CONTEXTE ci-dessous.  
-2. Si la réponse n’est pas explicitement dans le contexte, répond exactement :  
+Règles impératives :
+1. Citez toujours les numéros de page entre parenthèses (p. 2) pour chaque élément cité.
+2. Utilisez uniquement les informations ci-dessous (CONTEXT).
+3. Ne faites AUCUNE supposition ou déduction hors contexte.
+4. Si l'information n'est pas clairement écrite dans le contexte, répondez uniquement :  
    « Je ne trouve pas cette information dans les documents fournis. »
-3. Pour chaque fait utilisé, **cite la (ou les) page(s)** entre parenthèses, p. ex. : (p. 12) ou (p. 12, 15).
-4. Rédige la réponse en français, dans un style clair, pédagogique et concis.
+5. Écrivez en français clair, détailé et pédagogique.
 
-──────────────── CONTEXTE ────────────────
+──────────── CONTEXTE ────────────
 {reviews}
-───────────────────────────────────────────
+──────────────────────────────────
 
 Question :
 {question}
 
 Réponse :
+
 """
 
 
@@ -52,5 +55,7 @@ while True:
     
     reviews=retriever.invoke(question)
 
-    result=chain.invoke({"reviews":reviews, "question": question})
-    print(result)
+    results=chain.invoke({"reviews":reviews, "question": question})
+    for result in results:
+        print(result, end="", flush=True)
+        time.sleep(0.02) 

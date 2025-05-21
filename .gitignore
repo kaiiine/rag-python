@@ -1,0 +1,6 @@
+venv/*
+chrome_langchain_db/*
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd

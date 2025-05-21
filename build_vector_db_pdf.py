@@ -25,7 +25,7 @@ pdf_folder = "./pdfs"
 pdf_files = [f for f in os.listdir(pdf_folder) if f.endswith(".pdf")]
 
 documents = []
-cpt=1
+cpt=0
 for pdf_file in pdf_files:
     doc_path=os.path.join(pdf_folder, pdf_file)
     loader = PyPDFLoader(doc_path)

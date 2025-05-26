@@ -6,7 +6,7 @@ import pandas as pd
 from langchain_community.document_loaders import PyPDFLoader 
 import uuid
 
-dataframe=pd.read_csv("data.csv")
+dataframe=pd.read_csv("csv/data.csv")
 embeddings=OllamaEmbeddings(model="mxbai-embed-large")
 
 db_location="./chrome_langchain_db"

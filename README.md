@@ -1,103 +1,164 @@
-# rag-python
+# 🧪 Projet RAG Prof de Chimie avec LangChain + Ollama
 
+Ce projet est un système de questions/réponses (RAG : Retrieval-Augmented Generation) en français, destiné à répondre de manière rigoureuse à des questions de chimie en se basant uniquement sur des documents fournis (PDF, CSV, JSON).
 
+Le système utilise :
+- 🧠 [LangChain](https://www.langchain.com/)
+- 🔍 [ChromaDB](https://www.trychroma.com/)
+- 🤖 [Ollama](https://ollama.com/) pour les modèles LLM & embeddings
 
-## Getting started
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 📁 Structure du projet
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/nico_quent/rag-python.git
-git branch -M main
-git push -uf origin main
+.
+├── csv/                          # Contient les fichiers CSV à indexer
+├── json/                         # Contient les fichiers JSON à indexer
+├── pdf/                          # Contient les fichiers PDF à indexer
+├── chrome_langchain_db/         # Dossier de la base vectorielle Chroma (généré automatiquement)
+├── build_vector_db_pdf.py       # Script pour indexer les fichiers PDF
+├── build_vector_db_csv.py       # Script pour indexer les fichiers CSV
+├── build_vector_db_json.py      # Script pour indexer les fichiers JSON
+├── main.py                      # Script principal : lance le chatbot
+├── vector.py                    # Contient le `retriever` utilisé par le chatbot
+├── requirements.txt             # Liste des dépendances Python
+├── README.md                    # Ce fichier
+└── venv/                        # Environnement virtuel Python (recommandé)
 ```
 
-## Integrate with your tools
+---
 
-- [ ] [Set up project integrations](https://gitlab.com/nico_quent/rag-python/-/settings/integrations)
+## 🚀 Mise en route
 
-## Collaborate with your team
+### 1. Prérequis
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- Python 3.10 ou supérieur
+- Ollama installé avec les modèles suivants :
+  - `llama3.2:latest` (ou `llama2`, `mistral`, etc.)
+  - `mxbai-embed-large` pour les embeddings
+- `virtualenv` recommandé
 
-## Test and Deploy
+---
 
-Use the built-in continuous integration in GitLab.
+## ⚙️ Installation d'Ollama et des modèles
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### A. Installer Ollama
 
-***
+1. Rendez-vous sur [https://ollama.com](https://ollama.com) et téléchargez le binaire pour votre système d’exploitation.
+2. Installez-le selon les instructions (Linux, macOS, Windows).
+3. Vérifiez l'installation avec :
 
-# Editing this README
+```bash
+ollama --version
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### B. Télécharger les modèles nécessaires
 
-## Suggestions for a good README
+Une fois Ollama installé, lancez les commandes suivantes :
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+ollama run llama3.2
+```
 
-## Name
-Choose a self-explaining name for your project.
+```bash
+ollama run mxbai-embed-large
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Cela téléchargera les modèles localement et les rendra utilisables par votre projet.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+> Remarque : les noms de modèles doivent correspondre à ceux utilisés dans les scripts Python (`llama3.2:latest`, `mxbai-embed-large`).
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## 📦 Installation du projet
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### a. Créez un environnement virtuel
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```bash
+python3 -m venv venv
+source venv/bin/activate      # Sur Windows : venv\Scripts\activate
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### b. Installez les dépendances
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+pip install -r requirements.txt
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+---
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## 🧱 Construction de la base de données vectorielle
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### A. À partir de fichiers PDF
 
-## License
-For open source projects, say how it is licensed.
+1. Placez vos fichiers `.pdf` dans le dossier `pdf/`
+2. Lancez :
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```bash
+python build_vector_db_pdf.py
+```
 
+### B. À partir de fichiers CSV
 
-## Enter in a venv
-. venv/bin/activate
+1. Placez votre fichier `.csv` dans le dossier `csv/`
+2. Lancez :
 
-## Check
-echo $VIRTUAL_ENV  
+```bash
+python build_vector_db_csv.py
+```
 
-## Install requirements      
-pipi install -r ./requirements.txt
+### C. À partir de fichiers JSON
+
+1. Placez vos fichiers `.json` dans le dossier `json/`
+2. Lancez :
+
+```bash
+python build_vector_db_json.py
+```
+
+---
+
+## 💬 Utilisation du chatbot
+
+Une fois la base construite :
+
+```bash
+python main.py
+```
+
+Vous pouvez alors poser des questions en français basées sur les documents fournis.
+
+---
+
+## 🧠 Comportement du chatbot
+
+Le prompt impose des règles strictes :
+
+- Répond **uniquement** si l'information est **présente explicitement** dans les documents.
+- Citer les numéros de pages : `(p. 2)`
+- Répondre en **français clair, pédagogique et rigoureux**
+- Si l'information est absente :  
+  `« Je ne trouve pas cette information dans les documents fournis. »`
+
+---
+
+## 📌 Exemple d'utilisation
+
+```
+------------------------------------------
+Enter your question (q to quit): Quelle est la différence entre un acide et une base ?
+```
+
+Réponse possible :
+```
+Un acide est défini comme une espèce chimique capable de donner un proton (p. 2), tandis qu'une base peut capter ce proton (p. 3).
+```
+
+---
+
+## ✨ Remerciements
+
+- [LangChain](https://www.langchain.com/)
+- [Ollama](https://ollama.com/)
+- [ChromaDB](https://www.trychroma.com/)

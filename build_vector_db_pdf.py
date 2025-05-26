@@ -21,7 +21,7 @@ text_splitter=RecursiveCharacterTextSplitter(
     chunk_overlap=50
 )
 
-pdf_folder = "./pdfs"
+pdf_folder = "./pdf"
 pdf_files = [f for f in os.listdir(pdf_folder) if f.endswith(".pdf")]
 
 documents = []

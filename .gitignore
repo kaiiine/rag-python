@@ -1,6 +1,8 @@
 venv/*
 chrome_langchain_db/*
 pdfs/*
+json/*
+csv/*
 __pycache__/
 *.py[cod]
 *.pyo

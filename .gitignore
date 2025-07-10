@@ -3,6 +3,7 @@ chrome_langchain_db/*
 pdfs/*
 json/*
 csv/*
+data/*
 __pycache__/
 *.py[cod]
 *.pyo

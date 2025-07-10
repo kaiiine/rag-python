@@ -6,3 +6,7 @@ langchain-community
 pypdf
 pandas
 pymupdf
+
+# Huggging face
+sentence-transformers
+transformers

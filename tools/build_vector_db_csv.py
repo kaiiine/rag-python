@@ -1,13 +1,15 @@
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
+from sentence_transformers import SentenceTransformer
 import os
 import pandas as pd
 from langchain_community.document_loaders import PyPDFLoader 
 import uuid
 
-dataframe=pd.read_csv("csv/data.csv")
-embeddings=OllamaEmbeddings(model="mxbai-embed-large")
+dataframe=pd.read_csv("../csv/data.csv")
+#embeddings=OllamaEmbeddings(model="mxbai-embed-large")
+embeddings=SentenceTransformer(model="thenlper/gte-small")
 
 db_location="./chrome_langchain_db"
 

@@ -1,48 +1,14 @@
+from config import LLM_MODEL, LLM_TEMPERATURE, LLM_STREAM
 from langchain_ollama.llms import OllamaLLM 
 from langchain_core.prompts import ChatPromptTemplate
 from vector import retriever
-import time
 
 
-model = OllamaLLM(model="llama3.2:latest", temperature=0.0, stream=True)
-#model=OllamaLLM(model="llama2:7b")
-#model=OllamaLLM(model="mistral:latest", temperature=0.0, stream=True)
+model = OllamaLLM(model=LLM_MODEL, temperature=LLM_TEMPERATURE, stream=LLM_STREAM)
 
-old_template = """
-You're the best chemistry teacher ever.
-
-You must answer the following question (in french) **only** using the provided reviews. 
-If the answer is not in the reviews, say: "I cannot find this document in the document provided."
-
-Here are the reviews (you have to give the page number where you find information):
-{reviews}
-
-Question:
-{question}
-"""
-
-template = """
-Tu es un juruste expert en cadre légal de la junior entreprise. Vous ne devez répondre que si l'information est **STRICTEMENT présente dans le CONTEXTE**.
-
-Règles impératives :
-1. Citez toujours les numéros de page entre parenthèses (p. 2) pour chaque élément cité.
-2. Utilisez uniquement les informations ci-dessous (CONTEXT).
-3. Ne faites AUCUNE supposition ou déduction hors contexte.
-4. Si l'information n'est pas clairement écrite dans le contexte, répondez uniquement :  
-   « Je ne trouve pas cette information dans les documents fournis. »
-5. Écrivez en français clair, détailé et pédagogique.
-
-──────────── CONTEXTE ────────────
-{reviews}
-──────────────────────────────────
-
-Question :
-{question}
-
-Réponse :
-
-"""
-
+# Loading the prompt template
+with open("prompt.txt", "r", encoding="utf-8") as f:
+    template = f.read()
 
 prompt=ChatPromptTemplate.from_template(template)
 chain=prompt | model
@@ -55,7 +21,12 @@ while True:
     
     reviews=retriever.invoke(question)
 
-    results=chain.invoke({"reviews":reviews, "question": question})
-    for result in results:
-        print(result, end="", flush=True)
-        time.sleep(0.02) 
+    # Formater les documents pour le prompt pour qu'ils comprenne tmieux
+    formatted_reviews = ""
+    for i, doc in enumerate(reviews):
+        page_num = doc.metadata.get('page_number', 'N/A')
+        formatted_reviews += f"Document {i+1} (page {page_num}):\n{doc.page_content}\n\n"
+
+    #results=chain.invoke({"reviews":formatted_reviews, "question": question})
+    for chunk in chain.stream({"reviews": formatted_reviews, "question": question}):
+        print(chunk, end="", flush=True)

@@ -5,8 +5,13 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 import os
 import uuid
 import json
+try:
+    from langchain_huggingface import HuggingFaceEmbeddings
+except ImportError:
+    from langchain_community.embeddings import HuggingFaceEmbeddings
 
-embeddings = OllamaEmbeddings(model="mxbai-embed-large")
+#embeddings = OllamaEmbeddings(model="mxbai-embed-large")
+embeddings=HuggingFaceEmbeddings(model="thenlper/gte-small")
 db_location = "./chrome_langchain_db"
 
 vector_store = Chroma(

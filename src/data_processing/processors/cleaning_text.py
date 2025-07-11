@@ -1,6 +1,6 @@
 import re
 
-def clean_text(text):
+def cleaning(text):
     """
     Nettoie le texte extrait du PDF pour améliorer la qualité des embeddings
     """
@@ -35,7 +35,7 @@ def clean_text(text):
     text = text.strip()
     
     # Retourner vide si le texte est trop court après nettoyage
-    if len(text) < 10:
+    if len(text) < 4:
         return ""
     
     return text

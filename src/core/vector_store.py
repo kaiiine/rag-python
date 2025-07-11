@@ -1,4 +1,4 @@
-from config import COLLECTION_NAME, DB_LOCATION, EMBEDDING_PATH
+from src.utils.config import COLLECTION_NAME, DB_LOCATION, EMBEDDING_PATH
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 

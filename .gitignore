@@ -1,11 +1,40 @@
+# Virtual environment
 venv/*
-chrome_langchain_db/*
+
+# Models and embeddings
 embedding_models/*
+models/*
+
+# Database storage
+chrome_langchain_db/*
+storage/*
+
+# Data folders
 pdfs/*
 json/*
 csv/*
 data/*
+
+# Python cache and compiled files
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,4 +1,4 @@
-from config import EMBEDDING_MODEL_DOWNLOAD, EMBEDDING_PATH
+from src.utils.config import EMBEDDING_MODEL_DOWNLOAD, EMBEDDING_PATH
 from sentence_transformers import SentenceTransformer
 import os
 from os.path import exists
@@ -17,3 +17,13 @@ except Exception as e:
 else:
     print(f"Modèle d'embedding téléchargé et sauvegardé dans {save_path}")
     print("Vous pouvez maintenant utiliser ce modèle pour l'indexation et la recherche de documents.")
+
+
+def main():
+    """Main function for the installer"""
+    print("🔧 Installation du modèle d'embedding...")
+    # Le code principal est exécuté au niveau du module
+
+
+if __name__ == "__main__":
+    main()

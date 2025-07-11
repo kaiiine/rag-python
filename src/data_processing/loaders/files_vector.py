@@ -1,10 +1,10 @@
-from config import CHUNK_SIZE, CHUNK_OVERLAP
+from src.utils.config import CHUNK_SIZE, CHUNK_OVERLAP
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from tools.cleaning_text import cleaning
+from src.data_processing.processors.cleaning_text import cleaning
 try:
     from langchain_huggingface import HuggingFaceEmbeddings
 except ImportError:

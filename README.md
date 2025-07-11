@@ -1,164 +1,266 @@
-# 🧪 Projet RAG Prof de Chimie avec LangChain + Ollama
+# RAG Python - Système de Chatbot RAG
 
-Ce projet est un système de questions/réponses (RAG : Retrieval-Augmented Generation) en français, destiné à répondre de manière rigoureuse à des questions de chimie en se basant uniquement sur des documents fournis (PDF, CSV, JSON).
+Un système de chatbot intelligent utilisant la technologie RAG (Retrieval Augmented Generation) avec Langchain, ChromaDB et des modèles d'embedding modernes.
 
-Le système utilise :
-- 🧠 [LangChain](https://www.langchain.com/)
-- 🔍 [ChromaDB](https://www.trychroma.com/)
-- 🤖 [Ollama](https://ollama.com/) pour les modèles LLM & embeddings
+## 🎯 Fonctionnalités
 
----
+- **Chatbot conversationnel** avec recherche sémantique dans vos documents
+- **Support multi-formats** : JSON, PDF, CSV
+- **Embedding moderne** avec thenlper/gte-small
+- **Interface en streaming** pour des réponses en temps réel
+- **Mode debug** pour analyser les documents récupérés
+- **Architecture modulaire** et extensible
 
-## 📁 Structure du projet
+## 🏗️ Architecture
 
 ```
-.
-├── csv/                          # Contient les fichiers CSV à indexer
-├── json/                         # Contient les fichiers JSON à indexer
-├── pdf/                          # Contient les fichiers PDF à indexer
-├── chrome_langchain_db/         # Dossier de la base vectorielle Chroma (généré automatiquement)
-├── build_vector_db_pdf.py       # Script pour indexer les fichiers PDF
-├── build_vector_db_csv.py       # Script pour indexer les fichiers CSV
-├── build_vector_db_json.py      # Script pour indexer les fichiers JSON
-├── main.py                      # Script principal : lance le chatbot
-├── vector.py                    # Contient le `retriever` utilisé par le chatbot
-├── requirements.txt             # Liste des dépendances Python
-├── README.md                    # Ce fichier
-└── venv/                        # Environnement virtuel Python (recommandé)
+rag-python/
+├── src/                              # Code source principal
+│   ├── core/                         # Logique métier
+│   │   ├── chatbot.py               # Chatbot RAG principal
+│   │   └── vector_store.py          # Gestion base vectorielle
+│   ├── data_processing/             # Traitement des données
+│   │   ├── loaders/                 # Chargeurs de fichiers
+│   │   │   ├── files_vector.py      # Chargeur JSON
+│   │   │   ├── build_vector_db_*.py # Chargeurs spécialisés
+│   │   ├── processors/              # Processeurs de texte
+│   │   │   └── cleaning_text.py     # Nettoyage de texte
+│   │   └── build_vector.py          # Construction DB vectorielle
+│   └── utils/                       # Configuration et utilitaires
+│       ├── config.py                # Configuration centralisée
+│       └── main.py                  # Point d'entrée principal
+├── data/                            # Données sources
+├── embedding_models/                # Modèles d'embedding
+├── storage/                         # Stockage persistant
+│   └── vector_db/                   # Base de données vectorielle
+├── prompts/                         # Templates de prompts
+└── scripts/                         # Scripts utilitaires
+    ├── installer_embedding.py       # Installation modèles
+    └── health_check.py              # Vérification système
 ```
 
----
+## 🚀 Installation et démarrage rapide
 
-## 🚀 Mise en route
+### Méthode simple avec Makefile (recommandée)
+
+```bash
+# Installation complète
+make setup
+
+# Construction de la base vectorielle (ajoutez vos fichiers dans data/ avant)
+make build
+
+# Lancement du chatbot
+make run
+```
+
+### Méthode manuelle
 
 ### 1. Prérequis
+- Python 3.10+
+- Ollama installé avec le modèle mistral:7b-instruct-q4_K_M
 
-- Python 3.10 ou supérieur
-- Ollama installé avec les modèles suivants :
-  - `llama3.2:latest` (ou `llama2`, `mistral`, etc.)
-  - `mxbai-embed-large` pour les embeddings
-- `virtualenv` recommandé
-
----
-
-## ⚙️ Installation d'Ollama et des modèles
-
-### A. Installer Ollama
-
-1. Rendez-vous sur [https://ollama.com](https://ollama.com) et téléchargez le binaire pour votre système d’exploitation.
-2. Installez-le selon les instructions (Linux, macOS, Windows).
-3. Vérifiez l'installation avec :
-
-```bash
-ollama --version
-```
-
-### B. Télécharger les modèles nécessaires
-
-Une fois Ollama installé, lancez les commandes suivantes :
-
-```bash
-ollama run llama3.2
-```
-
-```bash
-ollama run mxbai-embed-large
-```
-
-Cela téléchargera les modèles localement et les rendra utilisables par votre projet.
-
-> Remarque : les noms de modèles doivent correspondre à ceux utilisés dans les scripts Python (`llama3.2:latest`, `mxbai-embed-large`).
-
----
-
-## 📦 Installation du projet
-
-### a. Créez un environnement virtuel
-
-```bash
-python3 -m venv venv
-source venv/bin/activate      # Sur Windows : venv\Scripts\activate
-```
-
-### b. Installez les dépendances
-
+### 2. Installation des dépendances
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 3. Installation du modèle d'embedding
+```bash
+python3 scripts/installer_embedding.py
+```
 
-## 🧱 Construction de la base de données vectorielle
+### 4. Préparation des données
+Placez vos fichiers dans le dossier `data/` :
+- **JSON** : Format `{"content": "texte", "filename": "nom"}`
+- **PDF** : Documents PDF standard
+- **CSV** : Fichiers avec colonnes de contenu
 
-### A. À partir de fichiers PDF
+### 5. Construction de la base vectorielle
+```bash
+PYTHONPATH=. python3 src/data_processing/build_vector.py
+```
 
-1. Placez vos fichiers `.pdf` dans le dossier `pdf/`
-2. Lancez :
+### 6. Lancement du chatbot
+```bash
+PYTHONPATH=. python3 main.py
+```
+
+## 🔧 Utilisation
+
+### Commandes Makefile
 
 ```bash
-python build_vector_db_pdf.py
+make help          # 📖 Afficher l'aide
+make setup         # 🚀 Installation complète
+make build         # 🔧 Construire la base vectorielle
+make run           # 🏃 Lancer le chatbot
+make check         # 🔍 Vérifier le système
+make status        # 📊 Statut du projet
+make clean         # 🧹 Nettoyer les fichiers temporaires
+make demo          # 🎬 Workflow complet de démonstration
 ```
 
-### B. À partir de fichiers CSV
+### Interface du chatbot
+```
+🤖 Chatbot RAG démarré!
+Tapez 'q' ou 'quit' pour quitter
+Tapez '/debug' pour activer/désactiver le mode debug
 
-1. Placez votre fichier `.csv` dans le dossier `csv/`
-2. Lancez :
+===========================================================================
+❓ Votre question: Que dit le document sur les polymères ?
+```
 
+### Commandes disponibles
+- **`/debug`** : Active/désactive le mode debug pour voir les documents récupérés
+- **`q`, `quit`, `exit`** : Quitter le chatbot
+
+### Mode debug
+Quand activé, affiche :
+- Nombre de documents trouvés
+- Aperçu des documents pertinents
+- Sources et métadonnées
+
+## ⚙️ Configuration
+
+Modifiez `src/utils/config.py` pour personnaliser :
+
+```python
+# Modèle LLM
+LLM_MODEL = "mistral:7b-instruct-q4_K_M"
+LLM_TEMPERATURE = 0.0
+
+# Modèle d'embedding
+EMBEDDING_MODEL_DOWNLOAD = "thenlper/gte-small"
+
+# Paramètres de chunking
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 75
+
+# Chemins des données
+DATA_FOLDER = "data/"
+```
+
+## 📁 Formats de fichiers supportés
+
+### JSON
+Structure attendue :
+```json
+[
+  {
+    "content": "Votre contenu textuel ici",
+    "filename": "nom_du_document"
+  }
+]
+```
+
+### PDF
+- Extraction automatique du texte
+- Métadonnées de page conservées
+- Nettoyage automatique du contenu
+
+### CSV
+- Colonne `content` pour le texte principal
+- Colonne `filename` optionnelle pour les noms
+
+## 🛠️ Scripts utilitaires
+
+### Vérification du système
 ```bash
-python build_vector_db_csv.py
+python3 scripts/health_check.py
 ```
+Vérifie que tous les composants sont correctement installés.
 
-### C. À partir de fichiers JSON
-
-1. Placez vos fichiers `.json` dans le dossier `json/`
-2. Lancez :
-
+### Installation des modèles
 ```bash
-python build_vector_db_json.py
+python3 scripts/installer_embedding.py
 ```
+Télécharge et installe le modèle d'embedding.
 
----
+## 🔍 Dépannage
 
-## 💬 Utilisation du chatbot
+### Problèmes courants
 
-Une fois la base construite :
-
+**❌ Modèle d'embedding manquant**
 ```bash
-python main.py
+make install-model
 ```
 
-Vous pouvez alors poser des questions en français basées sur les documents fournis.
+**❌ Erreur d'import de modules**
+```bash
+make install
+```
+
+**❌ Base vectorielle vide**
+```bash
+# Vérifiez que des fichiers sont dans data/
+make status
+# Reconstruisez la base
+make build
+```
+
+**❌ Ollama non disponible**
+```bash
+# Installez Ollama et le modèle
+ollama pull mistral:7b-instruct-q4_K_M
+```
+
+### Logs et debug
+- Utilisez `/debug` dans le chatbot pour voir les documents récupérés
+- Vérifiez les chemins dans `src/utils/config.py`
+- Lancez `make check` pour un diagnostic complet
+- Utilisez `make status` pour voir l'état du projet
+
+## 🚀 Développement
+
+### Ajouter un nouveau format de fichier
+1. Créer un loader dans `src/data_processing/loaders/`
+2. L'importer dans `build_vector.py`
+3. Ajouter la logique de détection du format
+
+### Personnaliser le nettoyage de texte
+Modifier `src/data_processing/processors/cleaning_text.py`
+
+### Changer le modèle d'embedding
+Modifier `EMBEDDING_MODEL_DOWNLOAD` dans `src/utils/config.py`
+
+### Structure des tests
+```bash
+# À venir
+tests/
+├── test_core/
+├── test_data_processing/
+└── fixtures/
+```
+
+## 📝 Technologies utilisées
+
+- **LangChain** : Framework pour applications LLM
+- **ChromaDB** : Base de données vectorielle
+- **Sentence Transformers** : Modèles d'embedding
+- **Ollama** : Serveur de modèles LLM local
+- **HuggingFace** : Hub de modèles et transformers
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
+3. Commit vos changements (`git commit -am 'Ajoute nouvelle fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
+5. Créer une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🙋‍♂️ Support
+
+Pour toute question ou problème :
+1. Vérifiez la section dépannage
+2. Lancez `python3 scripts/health_check.py`
+3. Consultez les logs d'erreur
+4. Ouvrez une issue sur GitHub
 
 ---
 
-## 🧠 Comportement du chatbot
-
-Le prompt impose des règles strictes :
-
-- Répond **uniquement** si l'information est **présente explicitement** dans les documents.
-- Citer les numéros de pages : `(p. 2)`
-- Répondre en **français clair, pédagogique et rigoureux**
-- Si l'information est absente :  
-  `« Je ne trouve pas cette information dans les documents fournis. »`
-
----
-
-## 📌 Exemple d'utilisation
-
-```
-------------------------------------------
-Enter your question (q to quit): Quelle est la différence entre un acide et une base ?
-```
-
-Réponse possible :
-```
-Un acide est défini comme une espèce chimique capable de donner un proton (p. 2), tandis qu'une base peut capter ce proton (p. 3).
-```
-
----
-
-## ✨ Remerciements
-
-- [LangChain](https://www.langchain.com/)
-- [Ollama](https://ollama.com/)
-- [ChromaDB](https://www.trychroma.com/)
+**Fait avec ❤️ en Python**

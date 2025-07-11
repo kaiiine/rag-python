@@ -1,7 +1,7 @@
-from config import LLM_MODEL, LLM_TEMPERATURE, LLM_STREAM, PROMPT_FILE
+from src.utils.config import LLM_MODEL, LLM_TEMPERATURE, LLM_STREAM, PROMPT_FILE
 from langchain_ollama.llms import OllamaLLM 
 from langchain_core.prompts import ChatPromptTemplate
-from vector import retriever
+from src.core.vector_store import retriever
 from typing import List, Generator
 from langchain_core.documents import Document
 import sys

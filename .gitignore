@@ -2,8 +2,13 @@
 venv/*
 
 # Models and embeddings
-embedding_models/*
-models/*
+embedding_models/
+embedding_model/
+models/
+*.safetensors
+*.bin
+*.h5
+*.onnx
 
 # Database storage
 chrome_langchain_db/*

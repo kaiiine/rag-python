@@ -1,10 +1,8 @@
-from config import COLLECTION_NAME, DB_LOCATION, EMBEDDING_MODEL
-from langchain_ollama import OllamaEmbeddings
+from config import COLLECTION_NAME, DB_LOCATION, EMBEDDING_PATH
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
-#embeddings = OllamaEmbeddings(model="mxbai-embed-large")
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_PATH)
 
 vector_store = Chroma(
     collection_name=COLLECTION_NAME,

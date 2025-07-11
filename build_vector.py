@@ -1,18 +1,12 @@
-from config import EMBEDDING_MODEL, DB_LOCATION, COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP, DATA_FOLDER
-from langchain_ollama import OllamaEmbeddings
+from config import EMBEDDING_PATH, DB_LOCATION, COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP, DATA_FOLDER
 from langchain_chroma import Chroma
-from langchain_core.documents import Document
-from langchain_community.document_loaders import PyPDFLoader 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
 from tools.files_vector import json_type
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-except ImportError:
-    from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
 
 
-embeddings=HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+embeddings=HuggingFaceEmbeddings(model_name=EMBEDDING_PATH)
 vector_store = Chroma(
     collection_name=COLLECTION_NAME,
     persist_directory=DB_LOCATION,

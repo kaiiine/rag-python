@@ -1,5 +1,6 @@
 venv/*
 chrome_langchain_db/*
+embedding_models/*
 pdfs/*
 json/*
 csv/*

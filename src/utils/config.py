@@ -15,6 +15,7 @@ EMBEDDING_MODEL_DOWNLOAD="thenlper/gte-small"
 LLM_MODEL = "mistral:7b-instruct-q4_K_M"
 LLM_TEMPERATURE = 0.0
 LLM_STREAM=True
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
 ## Embedding
 EMBEDDING_PATH = str(PROJECT_ROOT / "embedding_models" / EMBEDDING_MODEL_DOWNLOAD.split("/")[1])

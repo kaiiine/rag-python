@@ -1,0 +1,19 @@
+services:
+  rag-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    container_name: rag-python-app
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./data:/app/data
+      - ./pdfs:/app/pdfs
+      - ./storage/chrome_langchain_db:/app/storage/chrome_langchain_db
+      # - ./embedding_models:/app/embedding_models  # Commenté pour forcer le téléchargement
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+
+

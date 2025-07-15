@@ -1,4 +1,4 @@
-from src.utils.config import LLM_MODEL, LLM_TEMPERATURE, LLM_STREAM, PROMPT_FILE
+from src.utils.config import LLM_MODEL, LLM_TEMPERATURE, PROMPT_FILE
 from langchain_ollama.llms import OllamaLLM 
 from langchain_core.prompts import ChatPromptTemplate
 from src.core.vector_store import retriever
@@ -12,10 +12,11 @@ class RAGChatbot:
         self.model=OllamaLLM(
             model=LLM_MODEL,
             temperature=LLM_TEMPERATURE,
-            stream=LLM_STREAM
+            stream=True
         )
         self.prompt_template=self._load_prompt(prompt_file=PROMPT_FILE)
         self.chain=self.prompt_template | self.model
+        self.show_debug=False
 
     def _load_prompt(self, prompt_file:str) -> ChatPromptTemplate:
         try:
@@ -45,11 +46,10 @@ class RAGChatbot:
             page_num=doc.metadata.get('page_number', doc.metadata.get('entry_index', 'N/A'))
             filename=doc.metadata.get('filename', 'Inconnu')
             formatted_reviews+=f"Document {i+1} (Source: {filename}, Page/Section: {page_num}):\n{doc.page_content}\n\n"
-        
         return formatted_reviews
     
-    def ask_question(self, question:str, show_debug: bool = False) -> Generator[str, None, None]:
-       
+    def ask_question(self, question:str, show_debug:bool) -> Generator[str, None, None]:
+        print(".................", flush=True)
         if question.lower() == "/debug":
             show_debug= not show_debug
             if show_debug:
@@ -79,7 +79,7 @@ class RAGChatbot:
         except Exception as e:
             yield f"Erreur lors de la génération de la réponse: {e}"
 
-    def chat_loop(self, show_debug: bool = False):
+    def chat_loop(self):
         print("🤖 Chatbot RAG démarré!")
         print("Tapez 'q' ou 'quit' pour quitter")
         print("Tapez '/debug' pour activer/désactiver le mode debug")
@@ -96,11 +96,11 @@ class RAGChatbot:
                 print("⚠️ Veuillez poser une question.")
                 continue
             
-            print("🔍 Recherche de documents pertinents...", end="\r" ,flush=True)
+            print("🔍 Recherche de documents pertinents...",flush=True)
             print(" " * 60, end="\r")  
             print("📝 Génération de la réponse...", flush=True)
             try:
-                for chunk in self.ask_question(question, show_debug):
+                for chunk in self.ask_question(question, self.show_debug):
                     print(chunk, end='', flush=True)
 
             except KeyboardInterrupt:

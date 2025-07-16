@@ -48,11 +48,12 @@ class RAGChatbot:
             formatted_reviews+=f"Document {i+1} (Source: {filename}, Page/Section: {page_num}):\n{doc.page_content}\n\n"
         return formatted_reviews
     
-    def ask_question(self, question:str, show_debug:bool) -> Generator[str, None, None]:
+    def ask_question(self, question:str) -> Generator[str, None, None]:
         print(".................", flush=True)
         if question.lower() == "/debug":
-            show_debug= not show_debug
-            if show_debug:
+            self.show_debug= not self.show_debug
+            print(self.show_debug)
+            if self.show_debug:
                 yield "Mode debug activé. Posez votre question."
             else:
                 yield "Mode debug désactivé. Posez votre question."
@@ -60,7 +61,7 @@ class RAGChatbot:
 
         documents=self._retriever_documents(question)
 
-        if show_debug:
+        if self.show_debug:
             print(f"DEBUG: {len(documents)} documents trouvés")
             for i, doc in enumerate(documents):
                 filename=doc.metadata.get('filename', 'Inconnu')
@@ -100,7 +101,7 @@ class RAGChatbot:
             print(" " * 60, end="\r")  
             print("📝 Génération de la réponse...", flush=True)
             try:
-                for chunk in self.ask_question(question, self.show_debug):
+                for chunk in self.ask_question(question):
                     print(chunk, end='', flush=True)
 
             except KeyboardInterrupt:

@@ -1,24 +1,11 @@
-from langchain_ollama import OllamaEmbeddings
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import os
 import uuid
 import json
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-except ImportError:
-    from langchain_community.embeddings import HuggingFaceEmbeddings
+from src.utils.config import get_vector_store
 
-#embeddings = OllamaEmbeddings(model="mxbai-embed-large")
-embeddings=HuggingFaceEmbeddings(model="thenlper/gte-small")
-db_location = "./chrome_langchain_db"
-
-vector_store = Chroma(
-    collection_name="json_documents",
-    persist_directory=db_location,
-    embedding_function=embeddings,
-)
+vector_store = get_vector_store()
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=500,
@@ -60,6 +47,8 @@ for json_file in json_files:
                 documents.append(chunk)
 
 ids = [doc.metadata["id"] for doc in documents]
-vector_store.add_documents(documents=documents, ids=ids)
+BATCH_SIZE = 5000
+for i in range(0, len(documents), BATCH_SIZE):
+    vector_store.add_documents(documents=documents[i:i + BATCH_SIZE], ids=ids[i:i + BATCH_SIZE])
 
 print("fini")

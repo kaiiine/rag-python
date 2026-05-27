@@ -1,23 +1,11 @@
-from langchain_ollama import OllamaEmbeddings
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from sentence_transformers import SentenceTransformer
-import os
 import pandas as pd
-from langchain_community.document_loaders import PyPDFLoader 
+from src.utils.config import get_vector_store
 import uuid
 
 dataframe=pd.read_csv("../csv/data.csv")
-#embeddings=OllamaEmbeddings(model="mxbai-embed-large")
-embeddings=SentenceTransformer(model="thenlper/gte-small")
 
-db_location="./chrome_langchain_db"
-
-vector_store=Chroma(
-    collection_name="legal_rules",
-    persist_directory=db_location,
-    embedding_function=embeddings,
-)
+vector_store=get_vector_store()
 
 
 
@@ -39,7 +27,9 @@ for i, row in dataframe.iterrows():
     
 
 
-vector_store.add_documents(documents=documents, ids=ids)
+BATCH_SIZE = 5000
+for i in range(0, len(documents), BATCH_SIZE):
+    vector_store.add_documents(documents=documents[i:i + BATCH_SIZE], ids=ids[i:i + BATCH_SIZE])
 
 retriever=vector_store.as_retriever(
     search_kwargs={

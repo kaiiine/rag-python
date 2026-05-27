@@ -1,4 +1,4 @@
-from src.utils.config import EMBEDDING_PATH, DB_LOCATION, COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP, DATA_FOLDER
+from src.utils.config import CHUNK_SIZE, CHUNK_OVERLAP, DATA_FOLDER, get_vector_store, get_embedding
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -6,12 +6,8 @@ from src.data_processing.loaders.files_vector import json_type
 import os
 
 
-embeddings=HuggingFaceEmbeddings(model_name=EMBEDDING_PATH)
-vector_store = Chroma(
-    collection_name=COLLECTION_NAME,
-    persist_directory=DB_LOCATION,
-    embedding_function=embeddings
-)
+embeddings=get_embedding()
+vector_store = get_vector_store()
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=CHUNK_SIZE,

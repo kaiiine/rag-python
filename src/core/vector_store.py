@@ -1,15 +1,11 @@
-from src.utils.config import COLLECTION_NAME, DB_LOCATION, EMBEDDING_PATH
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from src.utils.config import SIMILARITY_THRESHOLD, get_vector_store
 
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_PATH)
-
-vector_store = Chroma(
-    collection_name=COLLECTION_NAME,
-    persist_directory=DB_LOCATION,
-    embedding_function=embeddings,
-)
+vector_store = get_vector_store()
 
 retriever = vector_store.as_retriever(
-    search_kwargs={"k": 7}
+    search_type="similarity_score_threshold",
+    search_kwargs={
+        "k": 8, 
+        "score_threshold": SIMILARITY_THRESHOLD,  
+    }
     )

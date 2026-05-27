@@ -1,0 +1,26 @@
+services:
+  rag-app:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    container_name: rag-python-app-gpu
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./data:/app/data
+      - ./pdfs:/app/pdfs
+      - ./storage/chrome_langchain_db:/app/storage/chrome_langchain_db
+      - ./embedding_models:/app/embedding_models  # Décommente si tu veux le lier au système
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_BASE_URL=http://localhost:11435
+    network_mode: "host"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia  # ⚠️ nécessaire pour activer le support GPU

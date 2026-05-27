@@ -1,0 +1,59 @@
+# =============================================================================
+# DOCKERFILE MULTI-STAGE OPTIMISÉ POUR BUILD RAPIDE
+# =============================================================================
+
+# Stage 1: Base avec dépendances (mise en cache)
+FROM python:3.11-slim as dependencies
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    libpoppler-cpp-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-cpu.txt /tmp/
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r /tmp/requirements-cpu.txt
+
+# Stage 2: Application finale
+FROM python:3.11-slim as runtime
+
+LABEL maintainer="qtdufour@gmail.com"
+LABEL description="RAG Application - Fast CPU-only build"
+LABEL version="1.0"
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV APP_HOME=/app
+
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=dependencies /usr/local/bin /usr/local/bin
+
+RUN apt-get update && apt-get install -y \
+    libpoppler-cpp0v5 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid appuser --shell /bin/bash --create-home appuser
+
+WORKDIR $APP_HOME
+
+COPY . .
+
+RUN mkdir -p data pdfs embedding_models chrome_langchain_db storage \
+    && chown -R appuser:appuser $APP_HOME
+
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+USER appuser
+
+EXPOSE 4200
+
+CMD ["/app/start.sh"]

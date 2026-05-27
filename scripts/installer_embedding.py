@@ -4,19 +4,24 @@ import os
 from os.path import exists
 
 try:
-    if not exists(EMBEDDING_PATH):
-        os.makedirs(EMBEDDING_PATH)
-        save_path = EMBEDDING_PATH
-
-    # Download and save the sentence-transformers model
+    print(f"🔧 Téléchargement du modèle: {EMBEDDING_MODEL_DOWNLOAD}")
+    print(f"📁 Dossier de destination: {EMBEDDING_PATH}")
+    
+    # Créer le dossier parent si nécessaire
+    parent_dir = os.path.dirname(EMBEDDING_PATH)
+    if not exists(parent_dir):
+        os.makedirs(parent_dir, exist_ok=True)
+        print(f"📁 Dossier créé: {parent_dir}")
+    
+    # Télécharger et sauvegarder le modèle
     model = SentenceTransformer(EMBEDDING_MODEL_DOWNLOAD)
-    model.save(save_path)
+    model.save(EMBEDDING_PATH)
+    
+    print(f"✅ Modèle sauvegardé dans: {EMBEDDING_PATH}")
+    
 except Exception as e:
-    print(f"Erreur lors du téléchargement du modèle d'embedding: {e}")
+    print(f"❌ Erreur lors du téléchargement du modèle d'embedding: {e}")
     raise e
-else:
-    print(f"Modèle d'embedding téléchargé et sauvegardé dans {save_path}")
-    print("Vous pouvez maintenant utiliser ce modèle pour l'indexation et la recherche de documents.")
 
 
 def main():

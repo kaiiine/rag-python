@@ -1,15 +1,17 @@
-from src.core.chatbot import RAGChatbot
 import sys
+from src.core.chatbot import RAGChatbot
+from src.utils.cli import chat_loop, console
+
 
 def main():
-    """Fonction principale"""
     try:
-        chatbot = RAGChatbot()
-        chatbot.chat_loop()
+        with console.status("[dim]Chargement du modèle…[/]", spinner="dots", spinner_style="cyan"):
+            chatbot = RAGChatbot()
+        chat_loop(chatbot)
     except KeyboardInterrupt:
-        print("\n👋 Programme interrompu. Au revoir!")
+        console.print("\n[dim]  Au revoir ![/]")
     except Exception as e:
-        print(f"❌ Erreur fatale: {e}")
+        console.print(f"\n  [bold red]Erreur fatale :[/] {e}")
         sys.exit(1)
 
 

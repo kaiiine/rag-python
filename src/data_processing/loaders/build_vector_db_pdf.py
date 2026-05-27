@@ -1,33 +1,23 @@
-from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.data_processing.processors.cleaning_text import cleaning
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-except ImportError:
-    from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
+from src.utils.config import get_vector_store, get_embedding
 import uuid
 
 #embeddings = OllamaEmbeddings(model="mxbai-embed-large")
-embeddings = HuggingFaceEmbeddings(model_name="thenlper/gte-small")
+embeddings = get_embedding()
 
-db_location="./chrome_langchain_db"
-
-vector_store = Chroma(
-    collection_name="chemistry_courses",
-    persist_directory=db_location,
-    embedding_function=embeddings,
-)
+vector_store = get_vector_store()
 
 text_splitter=RecursiveCharacterTextSplitter(
     chunk_size=500,
     chunk_overlap=75
 )
 
-pdf_folder = "./pdf"
+pdf_folder = "./data"
 pdf_files = [f for f in os.listdir(pdf_folder) if f.endswith(".pdf")]
 
 documents = []
@@ -56,5 +46,12 @@ for pdf_file in pdf_files:
 ids = [doc.metadata["id"] for doc in documents]
 print(f"Nombre total de documents après nettoyage : {len(documents)}")
 print(f"Ajout de {len(documents)} documents nettoyés à la base de données vectorielle...")
-vector_store.add_documents(documents=documents, ids=ids)
+
+BATCH_SIZE = 5000
+for i in range(0, len(documents), BATCH_SIZE):
+    batch_docs = documents[i:i + BATCH_SIZE]
+    batch_ids = ids[i:i + BATCH_SIZE]
+    vector_store.add_documents(documents=batch_docs, ids=batch_ids)
+    print(f"  Batch {i // BATCH_SIZE + 1} / {-(-len(documents) // BATCH_SIZE)} ajouté ({len(batch_docs)} docs)")
+
 print("Base de données vectorielle créée avec succès !")
